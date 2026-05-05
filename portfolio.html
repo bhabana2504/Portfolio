@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bhabana Kalita — CS Student &amp; Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#080807;--bg2:#0f0f0d;
+  --cream:#ede8df;--cream2:#c8c2b6;
+  --gold:#c8a96a;--gold2:#e0c080;
+  --muted:#5a5750;
+  --border:rgba(200,169,106,.15);--border2:rgba(200,169,106,.07);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'DM Sans',sans-serif;font-weight:300;cursor:none;overflow-x:hidden}
+ 
+/* CURSOR */
+#cursor{position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
+#cursor-dot{width:7px;height:7px;background:var(--gold);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+#cursor-ring{width:34px;height:34px;border:1px solid rgba(200,169,106,.45);border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s}
+body.hovering #cursor-ring{width:54px;height:54px;border-color:var(--gold)}
+ 
+/* GRAIN */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.045'/%3E%3C/svg%3E");pointer-events:none;z-index:9990;opacity:.38}
+ 
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:1.6rem 3.5rem;transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(8,8,7,.9);backdrop-filter:blur(14px);border-color:var(--border)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.1em;color:var(--cream);text-decoration:none}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .25s}
+.nav-links a:hover{color:var(--cream)}
+ 
+/* HERO */
+#hero{position:relative;height:100vh;min-height:700px;display:flex;align-items:flex-end;padding:0 3.5rem 5rem;overflow:hidden}
+#three-canvas{position:absolute;inset:0;z-index:0}
+.hero-inner{position:relative;z-index:2;width:100%}
+.hero-eyebrow{display:flex;align-items:center;gap:1rem;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem}
+.hero-eyebrow::before{content:'';width:2.5rem;height:1px;background:var(--gold)}
+.hero-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(5.5rem,13vw,13rem);line-height:.86;letter-spacing:.01em;text-transform:uppercase}
+.hero-name .outline{color:transparent;-webkit-text-stroke:1.5px var(--cream);display:block;transition:color .4s,-webkit-text-stroke-color .4s}
+.hero-name .outline:hover{color:var(--cream);-webkit-text-stroke-color:transparent}
+.hero-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;margin-top:2rem;padding-top:1.8rem;border-top:1px solid var(--border)}
+.hero-role{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.35rem;color:var(--gold)}
+.hero-loc{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:.4rem}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.scroll-hint{position:absolute;right:3.5rem;bottom:2.5rem;display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:2}
+.scroll-hint span{writing-mode:vertical-rl;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.scroll-line{width:1px;height:4rem;background:linear-gradient(to bottom,var(--gold),transparent);animation:scrollAnim 2s ease-in-out infinite;transform-origin:top}
+@keyframes scrollAnim{0%,100%{transform:scaleY(0);opacity:0}30%,70%{transform:scaleY(1);opacity:1}}
+ 
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:.6rem;padding:.8rem 2rem;font-family:'DM Sans',sans-serif;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;border:1px solid var(--border);color:var(--cream);background:transparent;cursor:none;position:relative;overflow:hidden;transition:color .35s,border-color .35s}
+.btn::before{content:'';position:absolute;inset:0;background:var(--gold);transform:translateY(101%);transition:transform .35s cubic-bezier(.76,0,.24,1);z-index:-1}
+.btn:hover{color:var(--bg);border-color:var(--gold)}
+.btn:hover::before{transform:translateY(0)}
+.btn-primary{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.btn-primary::before{background:var(--cream2)}
+.btn-primary:hover{color:var(--bg);border-color:var(--cream2)}
+ 
+/* SECTION COMMON */
+section{padding:7rem 3.5rem}
+.section-label{display:flex;align-items:center;gap:1rem;font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:4rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+ 
+/* ABOUT */
+#about{background:var(--bg2)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:start}
+.about-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,5.5vw,5.5rem);line-height:.9;text-transform:uppercase}
+.about-headline em{font-style:normal;color:transparent;-webkit-text-stroke:1px var(--gold)}
+.about-objective{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.2rem;line-height:1.65;color:var(--cream2);margin-bottom:2rem;padding-left:1.5rem;border-left:2px solid var(--gold)}
+.about-text{font-size:.88rem;line-height:1.9;color:var(--muted);margin-bottom:2rem}
+.about-tags{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+.tag{padding:.35rem .9rem;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--border);color:var(--cream2);transition:border-color .25s,color .25s}
+.tag:hover{border-color:var(--gold);color:var(--gold)}
+ 
+/* SKILLS */
+.skills-intro{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(1.4rem,2.8vw,2.6rem);line-height:1.4;color:var(--cream2);max-width:680px;margin-bottom:4rem}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:var(--border2);border:1px solid var(--border2)}
+.skill-card{background:var(--bg);padding:2rem 1.8rem;position:relative;overflow:hidden;transition:background .3s;transform-style:preserve-3d}
+.skill-card:hover{background:var(--bg2)}
+.skill-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s ease}
+.skill-card:hover::before{transform:scaleX(1)}
+.skill-cat{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
+.skill-name{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.04em;color:var(--cream);line-height:1;margin-bottom:.5rem}
+.skill-sub{font-size:.72rem;color:var(--muted);line-height:1.5}
+ 
+/* EXPERIENCE */
+#experience{background:var(--bg2)}
+.exp-list{display:flex;flex-direction:column}
+.exp-item{display:grid;grid-template-columns:180px 1fr auto;gap:2rem;align-items:start;padding:2.5rem 0;border-bottom:1px solid var(--border2);position:relative}
+.exp-item:first-child{border-top:1px solid var(--border2)}
+.exp-item::before{content:'';position:absolute;left:-3.5rem;right:-3.5rem;top:0;bottom:0;background:rgba(200,169,106,.03);opacity:0;transition:opacity .3s}
+.exp-item:hover::before{opacity:1}
+.exp-period{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:.3rem}
+.exp-role{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.03em;color:var(--cream);line-height:1;margin-bottom:.4rem}
+.exp-company{font-size:.78rem;color:var(--gold);letter-spacing:.08em;margin-bottom:1rem}
+.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.exp-bullets li{font-size:.82rem;line-height:1.65;color:var(--muted);padding-left:1rem;position:relative}
+.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--gold);font-size:.7rem}
+.exp-index{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;color:var(--border);line-height:1;letter-spacing:-.02em}
+ 
+/* PROJECTS */
+.projects-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:4rem;flex-wrap:wrap;gap:2rem}
+.projects-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,7vw,7rem);line-height:.88;text-transform:uppercase}
+.projects-title span{display:block;color:transparent;-webkit-text-stroke:1px var(--cream2)}
+.project-list{display:flex;flex-direction:column;gap:1px;background:var(--border2)}
+.project-item{background:var(--bg);display:grid;grid-template-columns:60px 1fr auto;gap:2.5rem;align-items:center;padding:2.2rem 2.5rem;cursor:none;transition:background .3s;position:relative;overflow:hidden}
+.project-item::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);transform:scaleY(0);transform-origin:top;transition:transform .35s ease}
+.project-item:hover{background:var(--bg2)}
+.project-item:hover::after{transform:scaleY(1)}
+.project-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--border);line-height:1;transition:color .3s}
+.project-item:hover .project-num{color:var(--gold)}
+.project-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.03em;color:var(--cream);line-height:1;margin-bottom:.5rem}
+.project-desc{font-size:.8rem;line-height:1.65;color:var(--muted);max-width:600px}
+.project-tech{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+.tech-chip{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .6rem;border:1px solid var(--border);color:var(--gold)}
+.project-link{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:all .3s;flex-shrink:0}
+.project-link:hover{border-color:var(--gold);color:var(--gold);background:rgba(200,169,106,.08)}
+ 
+/* CERTIFICATIONS */
+#certifications{background:var(--bg2)}
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1px;background:var(--border2)}
+.cert-card{background:var(--bg2);padding:2rem;position:relative;overflow:hidden;transition:background .3s;transform-style:preserve-3d}
+.cert-card:hover{background:var(--bg)}
+.cert-icon{width:42px;height:42px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem;color:var(--gold)}
+.cert-name{font-size:.88rem;font-weight:500;color:var(--cream);line-height:1.4;margin-bottom:.4rem}
+.cert-issuer{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cert-shine{position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(200,169,106,.08) 0%,transparent 60%);opacity:0;transition:opacity .4s}
+.cert-card:hover .cert-shine{opacity:1}
+ 
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.ach-card{padding:2.5rem;border:1px solid var(--border2);position:relative;overflow:hidden;transition:border-color .3s;transform-style:preserve-3d;perspective:800px}
+.ach-card:hover{border-color:var(--border)}
+.ach-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:translateX(-100%);transition:transform .6s ease}
+.ach-card:hover::before{transform:translateX(100%)}
+.ach-num{font-family:'Bebas Neue',sans-serif;font-size:4rem;line-height:1;color:var(--border);margin-bottom:1rem;transition:color .3s}
+.ach-card:hover .ach-num{color:rgba(200,169,106,.22)}
+.ach-title{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.03em;color:var(--cream);line-height:1.1;margin-bottom:.6rem}
+.ach-desc{font-size:.8rem;line-height:1.7;color:var(--muted)}
+ 
+/* EDUCATION */
+#education{background:var(--bg2)}
+.edu-list{display:flex;flex-direction:column;gap:1px;background:var(--border2)}
+.edu-item{background:var(--bg2);display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;padding:2rem 2.5rem;transition:background .3s}
+.edu-item:hover{background:var(--bg)}
+.edu-degree{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.03em;color:var(--cream);line-height:1;margin-bottom:.3rem}
+.edu-school{font-size:.78rem;color:var(--gold);letter-spacing:.08em;margin-bottom:.2rem}
+.edu-meta{font-size:.72rem;color:var(--muted)}
+.edu-score{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--border);text-align:right;transition:color .3s}
+.edu-item:hover .edu-score{color:var(--gold)}
+ 
+/* CONTACT */
+#contact{min-height:65vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+#contact-canvas{position:absolute;inset:0;z-index:0}
+.contact-inner{position:relative;z-index:2}
+.contact-label{font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem}
+.contact-big{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,10vw,10rem);line-height:.88;text-transform:uppercase;margin-bottom:2rem}
+.contact-big span{display:block;color:transparent;-webkit-text-stroke:1px var(--cream)}
+.contact-email{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.3rem;color:var(--gold);text-decoration:none;margin-bottom:2.5rem;display:block;transition:color .25s}
+.contact-email:hover{color:var(--gold2)}
+.contact-links{display:flex;align-items:center;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+.social-link{display:flex;align-items:center;gap:.5rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .25s;padding:.5rem 0;border-bottom:1px solid transparent}
+.social-link:hover{color:var(--cream);border-color:var(--border)}
+ 
+/* FOOTER */
+footer{padding:2rem 3.5rem;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+footer p{font-size:.7rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+ 
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(38px);transition:opacity .8s ease,transform .8s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+ 
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:1.2rem 1.5rem}
+  .nav-links{gap:1.5rem}
+  section{padding:5rem 1.5rem}
+  #hero{padding:0 1.5rem 4rem}
+  .about-grid{grid-template-columns:1fr;gap:3rem}
+  .ach-grid{grid-template-columns:1fr}
+  .exp-item{grid-template-columns:1fr;gap:.8rem}
+  .exp-index{display:none}
+  .project-item{grid-template-columns:40px 1fr}
+  .project-link{display:none}
+  .scroll-hint{display:none}
+}
+@media(max-width:600px){
+  .hero-bottom{flex-direction:column;align-items:flex-start}
+  .contact-big{font-size:clamp(3rem,14vw,6rem)}
+}
+</style>
+</head>
+<body>
+ 
+<!-- CURSOR -->
+<div id="cursor"><div id="cursor-dot"></div><div id="cursor-ring"></div></div>
+ 
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">BHABANA KALITA</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+ 
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <canvas id="three-canvas"></canvas>
+  <div class="hero-inner">
+    <div class="hero-eyebrow reveal">Computer Science &amp; Engineering &middot;Machine Learning &middot; Web Development &middot;</div>
+    <h1 class="hero-name reveal reveal-delay-1">
+      Bhabana<span class="outline">Kalita</span>
+    </h1>
+    <div class="hero-bottom reveal reveal-delay-2">
+      <div>
+        <div class="hero-role">Developer &amp; Problem Solver</div>
+        <div class="hero-loc">Greater Noida, UP &middot; Available for Internships</div>
+      </div>
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-primary">Get in Touch</a>
+        <a href="#projects" class="btn">View Projects</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+ 
+<!-- ════ ABOUT ════ -->
+<section id="about">
+  <div class="section-label">About Me</div>
+  <div class="about-grid">
+    <div class="reveal">
+      <h2 class="about-headline">Building<br>Things<br>That<br><em>Matter</em></h2>
+      <div class="about-tags" style="margin-top:2rem">
+        <span class="tag">Java</span>
+        <span class="tag">Python</span>
+        <span class="tag">Machine Learning</span>
+        <span class="tag">Cybersecurity</span>
+        <span class="tag">React</span>
+        <span class="tag">DSA</span>
+        <span class="tag">REST APIs</span>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <p class="about-objective">
+        Results-driven Computer Science undergraduate targeting Software Engineer / Developer internship roles — applying expertise in Java, Python, Machine Learning, and Cybersecurity to build efficient, high-impact software solutions.
+      </p>
+      <p class="about-text">
+        I'm a two-time Smart India Hackathon finalist (university-level) and team leader with a strong foundation in Data Structures &amp; Algorithms, scalable ML pipelines, and cybersecurity. I thrive at the intersection of algorithmic thinking and real-world application — from AES-encrypted distributed systems to AI-powered risk predictors. Driven by the belief that well-engineered software can meaningfully change how the world operates.
+      </p>
+      <a href="mailto:bhabanakalita25@gmail.com" class="btn" style="margin-top:1rem">Say Hello</a>
+    </div>
+  </div>
+</section>
+ 
+<!-- ════ SKILLS ════ -->
+<section id="skills">
+  <div class="section-label">Technical Skills</div>
+  <p class="skills-intro reveal">A toolkit forged through hackathons, internships, and building real things.</p>
+  <div class="skills-grid">
+    <div class="skill-card reveal" data-tilt><div class="skill-cat">Languages</div><div class="skill-name">Java</div><div class="skill-sub">OOP &middot; Multithreading &middot; Socket Programming</div></div>
+    <div class="skill-card reveal reveal-delay-1" data-tilt><div class="skill-cat">Languages</div><div class="skill-name">Python</div><div class="skill-sub">Pandas &middot; NumPy &middot; Flask &middot; Scikit-learn</div></div>
+    <div class="skill-card reveal reveal-delay-2" data-tilt><div class="skill-cat">Web</div><div class="skill-name">React</div><div class="skill-sub">Component Architecture &middot; REST APIs &middot; Dashboards</div></div>
+    <div class="skill-card reveal reveal-delay-3" data-tilt><div class="skill-cat">AI / ML</div><div class="skill-name">ML</div><div class="skill-sub">Classification &middot; Regression &middot; ETL Pipelines &middot; Scikit-learn</div></div>
+    <div class="skill-card reveal" data-tilt><div class="skill-cat">Security</div><div class="skill-name">Cyber</div><div class="skill-sub">Pen Testing &middot; OWASP &middot; Vulnerability Assessment</div></div>
+    <div class="skill-card reveal reveal-delay-1" data-tilt><div class="skill-cat">Database</div><div class="skill-name">SQL</div><div class="skill-sub">ETL &middot; Data Modeling &middot; Queries</div></div>
+    <div class="skill-card reveal reveal-delay-2" data-tilt><div class="skill-cat">Cloud</div><div class="skill-name">AWS</div><div class="skill-sub">Data Engineering &middot; Cloud Services &middot; Academy Graduate</div></div>
+    <div class="skill-card reveal reveal-delay-3" data-tilt><div class="skill-cat">Core CS</div><div class="skill-name">DSA</div><div class="skill-sub">Algorithms &middot; Data Structures &middot; Problem Solving</div></div>
+    <div class="skill-card reveal" data-tilt><div class="skill-cat">Web</div><div class="skill-name">HTML/CSS</div><div class="skill-sub">HTML5 &middot; CSS3 &middot; JavaScript &middot; REST APIs</div></div>
+    <div class="skill-card reveal reveal-delay-1" data-tilt><div class="skill-cat">Languages</div><div class="skill-name">C</div><div class="skill-sub">Systems Programming &middot; Data Structures</div></div>
+    <div class="skill-card reveal reveal-delay-2" data-tilt><div class="skill-cat">AI</div><div class="skill-name">Gen AI</div><div class="skill-sub">LLMs &middot; Workflow Design &middot; Model Optimization</div></div>
+    <div class="skill-card reveal reveal-delay-3" data-tilt><div class="skill-cat">Tools</div><div class="skill-name">Tools</div><div class="skill-sub">Git &middot; GitHub &middot; Figma &middot; Canva</div></div>
+  </div>
+</section>
+ 
+<!-- ════ EXPERIENCE ════ -->
+<section id="experience">
+  <div class="section-label">Internship Experience</div>
+  <div class="exp-list">
+    <div class="exp-item reveal">
+      <div class="exp-period">Jun 2025<br>Jul 2025</div>
+      <div>
+        <div class="exp-role">Cybersecurity Intern</div>
+        <div class="exp-company">Codec Technologies</div>
+        <ul class="exp-bullets">
+          <li>Conducted vulnerability assessments and penetration testing on web and network systems, identifying 10+ critical security vulnerabilities across applications and infrastructure.</li>
+          <li>Performed phishing simulations and ethical hacking exercises using OWASP principles, reducing potential attack vectors and improving overall system resilience.</li>
+        </ul>
+      </div>
+      <div class="exp-index">01</div>
+    </div>
+    <div class="exp-item reveal reveal-delay-1">
+      <div class="exp-period">Oct 2024<br>Dec 2024</div>
+      <div>
+        <div class="exp-role">Generative AI Intern</div>
+        <div class="exp-company">Eduskills Foundation</div>
+        <ul class="exp-bullets">
+          <li>Designed and developed Generative AI workflows using Large Language Models, improving model response accuracy and efficiency across multiple test scenarios.</li>
+        </ul>
+      </div>
+      <div class="exp-index">02</div>
+    </div>
+  </div>
+</section>
+ 
+<!-- ════ PROJECTS ════ -->
+<section id="projects">
+  <div class="section-label">Selected Projects</div>
+  <div class="projects-header">
+    <h2 class="projects-title reveal">Selected<span>Work</span></h2>
+    <a href="https://github.com/bhabana2504" target="_blank" rel="noopener" class="btn reveal reveal-delay-2">View All on GitHub</a>
+  </div>
+  <div class="project-list">
+    <div class="project-item reveal">
+      <div class="project-num">01</div>
+      <div>
+        <div class="project-name">Secure File Transfer System</div>
+        <div class="project-desc">Production-grade AES-256 encrypted peer-to-peer file transfer in Java using TCP Socket Programming and Multithreading. Features checksum validation, token-based authentication, and role-based access control (RBAC).</div>
+        <div class="project-tech">
+          <span class="tech-chip">Java</span><span class="tech-chip">AES-256</span><span class="tech-chip">Socket Programming</span><span class="tech-chip">Cryptography</span><span class="tech-chip">Multithreading</span>
+        </div>
+      </div>
+      <a href="https://github.com/bhabana2504/Secure-File-transfer" target="_blank" rel="noopener" class="project-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+    <div class="project-item reveal reveal-delay-1">
+      <div class="project-num">02</div>
+      <div>
+        <div class="project-name">AI Supply Chain Risk Predictor</div>
+        <div class="project-desc">Supervised ML classification model achieving 87%+ accuracy predicting supply chain disruption across 500+ real-world data points. Includes end-to-end ETL pipeline, Flask REST API, and React dashboard for real-time risk visualization.</div>
+        <div class="project-tech">
+          <span class="tech-chip">Python</span><span class="tech-chip">Scikit-learn</span><span class="tech-chip">Pandas</span><span class="tech-chip">Flask</span><span class="tech-chip">REST API</span><span class="tech-chip">React</span>
+        </div>
+      </div>
+      <a href="https://github.com/bhabana2504/supply-chain-risk-predictor" target="_blank" rel="noopener" class="project-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+ 
+<!-- ════ CERTIFICATIONS ════ -->
+<section id="certifications">
+  <div class="section-label">Certifications</div>
+  <div class="certs-grid">
+    <div class="cert-card reveal" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="cert-name">AWS Academy Graduate — Data Engineering</div><div class="cert-issuer">Amazon Web Services &middot; Sep 2025</div></div>
+    <div class="cert-card reveal reveal-delay-1" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div class="cert-name">Oracle: AI Foundation Associate</div><div class="cert-issuer">Oracle</div></div>
+    <div class="cert-card reveal reveal-delay-2" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div class="cert-name">Oracle: SQL</div><div class="cert-issuer">Oracle</div></div>
+    <div class="cert-card reveal reveal-delay-3" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><div class="cert-name">Business Intelligence</div><div class="cert-issuer">Infosys</div></div>
+    <div class="cert-card reveal" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 20h20M5 20V8l7-5 7 5v12"/><path d="M9 20v-5h6v5"/></svg></div><div class="cert-name">Java &middot; 100 Days of Python &middot; Data Structures</div><div class="cert-issuer">GUVI — IIT Madras</div></div>
+    <div class="cert-card reveal reveal-delay-1" data-tilt><div class="cert-shine"></div><div class="cert-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div class="cert-name">C Programming</div><div class="cert-issuer">CodeChef</div></div>
+  </div>
+</section>
+ 
+<!-- ════ ACHIEVEMENTS ════ -->
+<section id="achievements">
+  <div class="section-label">Achievements &amp; Leadership</div>
+  <div class="ach-grid">
+    <div class="ach-card reveal" data-tilt><div class="ach-num">01</div><div class="ach-title">Smart India Hackathon 2025 — Team Leader</div><div class="ach-desc">Top 50 teams out of 50,000+ participants. Led strategy, technical task delegation, and final presentation for a national-level software engineering challenge.</div></div>
+    <div class="ach-card reveal reveal-delay-1" data-tilt><div class="ach-num">02</div><div class="ach-title">Smart India Hackathon 2024 — National Finalist</div><div class="ach-desc">Drove end-to-end solution design, algorithm development, and cross-functional team coordination for a nationally recognized hackathon.</div></div>
+    <div class="ach-card reveal reveal-delay-2" data-tilt><div class="ach-num">03</div><div class="ach-title">6+ Hackathons Participated</div><div class="ach-desc">Consistently demonstrated rapid prototyping, problem-solving with DSA, and collaborative leadership under time constraints across multiple competitive events.</div></div>
+    <div class="ach-card reveal reveal-delay-3" data-tilt><div class="ach-num">04</div><div class="ach-title">Multi-Domain Builder</div><div class="ach-desc">Built real systems spanning ML, cybersecurity, and distributed computing — from AES-encrypted file transfer to AI supply chain predictors with 87%+ accuracy.</div></div>
+  </div>
+</section>
+ 
+<!-- ════ EDUCATION ════ -->
+<section id="education">
+  <div class="section-label">Education</div>
+  <div class="edu-list">
+    <div class="edu-item reveal"><div><div class="edu-degree">B.Tech — Computer Science &amp; Engineering</div><div class="edu-school">Galgotias University</div><div class="edu-meta">2023 – 2027</div></div><div class="edu-score">7.5 CGPA</div></div>
+    <div class="edu-item reveal reveal-delay-1"><div><div class="edu-degree">Senior Secondary — Class XII</div><div class="edu-school">Narayana E-Techno School, Guwahati</div><div class="edu-meta">2023</div></div><div class="edu-score">71.9%</div></div>
+    <div class="edu-item reveal reveal-delay-2"><div><div class="edu-degree">Secondary — Class X</div><div class="edu-school">Don Bosco School, Sonaighuli</div><div class="edu-meta">2021</div></div><div class="edu-score">82.6%</div></div>
+  </div>
+</section>
+ 
+<!-- ════ CONTACT ════ -->
+<section id="contact">
+  <canvas id="contact-canvas"></canvas>
+  <div class="contact-inner">
+    <div class="contact-label reveal">Get in Touch</div>
+    <h2 class="contact-big reveal reveal-delay-1">Let's<span>Talk</span></h2>
+    <a href="bhabanakalita25@gmail.com" class="contact-email reveal reveal-delay-2">bhabanakalita25@gmail.com</a>
+    <div class="contact-links reveal reveal-delay-3">
+      <a href="https://github.com/bhabana2504" target="_blank" rel="noopener" class="social-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.38.6.11.82-.26.82-.58v-2.17c-3.34.73-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.74-1.33-1.74-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.21.7.82.58C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>GitHub</a>
+      <a href="https://linkedin.com/in/bhabana-kalita-338640295" target="_blank" rel="noopener" class="social-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zm1.78 13.02H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0z"/></svg>LinkedIn</a>
+      <a href="tel:+916003400833" class="social-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>+91 600 340 0833</a>
+    </div>
+  </div>
+</section>
+ 
+<footer>
+  <p>&copy; Bhabana Kalita</p>
+  <p>CS &amp; Engineering &middot; Galgotias University</p>
+</footer>
+ 
+<script>
+/* ══ THREE.JS HERO — Torus Knot + Particles ══ */
+(function(){
+  const canvas = document.getElementById('three-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ 
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 1000);
+  camera.position.set(0, 0, 5);
+ 
+  scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+  const dl1 = new THREE.DirectionalLight(0xc8a96a, 2);
+  dl1.position.set(3, 5, 3);
+  scene.add(dl1);
+  const dl2 = new THREE.DirectionalLight(0xe0c080, 0.6);
+  dl2.position.set(-4, -2, -3);
+  scene.add(dl2);
+ 
+  // Torus knot
+  const kGeo = new THREE.TorusKnotGeometry(1.35, 0.36, 160, 20);
+  const kMat = new THREE.MeshPhongMaterial({color:0x18180f, emissive:0x0a0902, shininess:90, specular:0xc8a96a});
+  const knot = new THREE.Mesh(kGeo, kMat);
+  scene.add(knot);
+ 
+  // Wireframe overlay
+  const wMat = new THREE.MeshBasicMaterial({color:0xc8a96a, wireframe:true, transparent:true, opacity:0.1});
+  const wireKnot = new THREE.Mesh(kGeo, wMat);
+  scene.add(wireKnot);
+ 
+  // Outer ring
+  const rGeo = new THREE.TorusGeometry(2.5, 0.01, 4, 140);
+  const rMat = new THREE.MeshBasicMaterial({color:0xc8a96a, transparent:true, opacity:0.3});
+  const ring = new THREE.Mesh(rGeo, rMat);
+  ring.rotation.x = Math.PI/3;
+  scene.add(ring);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(3, 0.007, 4, 140), new THREE.MeshBasicMaterial({color:0xc8a96a, transparent:true, opacity:0.12}));
+  ring2.rotation.x = Math.PI/5;
+  ring2.rotation.z = Math.PI/4;
+  scene.add(ring2);
+ 
+  // Particles
+  const pN = 350;
+  const pPos = new Float32Array(pN*3);
+  for(let i=0;i<pN;i++){pPos[i*3]=(Math.random()-.5)*16;pPos[i*3+1]=(Math.random()-.5)*16;pPos[i*3+2]=(Math.random()-.5)*16;}
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+  scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({color:0xc8a96a, size:0.028, transparent:true, opacity:0.55})));
+ 
+  let mx=0, my=0;
+  document.addEventListener('mousemove', e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2;});
+ 
+  function resize(){
+    const hero = document.getElementById('hero');
+    const w=hero.offsetWidth, h=hero.offsetHeight;
+    renderer.setSize(w,h);
+    camera.aspect=w/h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+ 
+  (function loop(){
+    requestAnimationFrame(loop);
+    const t = Date.now()*.001;
+    knot.rotation.x = t*.18 + my*.28;
+    knot.rotation.y = t*.24 + mx*.28;
+    wireKnot.rotation.copy(knot.rotation);
+    ring.rotation.z = t*.07;
+    ring2.rotation.y = t*.05;
+    renderer.render(scene, camera);
+  })();
+})();
+ 
+/* ══ THREE.JS CONTACT — Particle sphere ══ */
+(function(){
+  const canvas = document.getElementById('contact-canvas');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ 
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+  camera.position.z = 5;
+ 
+  const n=600;
+  const pos = new Float32Array(n*3);
+  for(let i=0;i<n;i++){pos[i*3]=(Math.random()-.5)*12;pos[i*3+1]=(Math.random()-.5)*12;pos[i*3+2]=(Math.random()-.5)*12;}
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({color:0xc8a96a, size:0.04, transparent:true, opacity:0.55})));
+ 
+  const tGeo = new THREE.TorusGeometry(2, 0.007, 4, 120);
+  const tMat = new THREE.MeshBasicMaterial({color:0xc8a96a, transparent:true, opacity:0.18});
+  const t1=new THREE.Mesh(tGeo,tMat); scene.add(t1);
+  const t2=new THREE.Mesh(tGeo,tMat); t2.rotation.x=Math.PI/2; scene.add(t2);
+  const t3=new THREE.Mesh(tGeo,tMat); t3.rotation.y=Math.PI/3; scene.add(t3);
+ 
+  function resize(){
+    const el=document.getElementById('contact');
+    const w=el.offsetWidth, h=el.offsetHeight;
+    renderer.setSize(w,h);
+    camera.aspect=w/h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+ 
+  (function loop(){
+    requestAnimationFrame(loop);
+    const time=Date.now()*.001;
+    t1.rotation.z=time*.25; t2.rotation.z=time*.18; t3.rotation.x=time*.2;
+    renderer.render(scene, camera);
+  })();
+})();
+ 
+/* ══ CURSOR ══ */
+const cursor = document.getElementById('cursor');
+let cx=innerWidth/2, cy=innerHeight/2;
+document.addEventListener('mousemove', e=>{cx=e.clientX;cy=e.clientY;});
+(function loop(){requestAnimationFrame(loop);cursor.style.left=cx+'px';cursor.style.top=cy+'px';})();
+document.querySelectorAll('a,button,.skill-card,.project-item,.cert-card,.ach-card,.edu-item,.exp-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));
+});
+ 
+/* ══ NAV SCROLL ══ */
+window.addEventListener('scroll',()=>document.getElementById('navbar').classList.toggle('scrolled',scrollY>60));
+ 
+/* ══ REVEAL ON SCROLL ══ */
+const io = new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+ 
+/* ══ 3D TILT CARDS ══ */
+document.querySelectorAll('[data-tilt]').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(700px) rotateX(${-y*12}deg) rotateY(${x*12}deg) translateZ(10px)`;
+    card.style.transition='none';
+  });
+  card.addEventListener('mouseleave',()=>{
+    card.style.transform='perspective(700px) rotateX(0) rotateY(0) translateZ(0)';
+    card.style.transition='transform .5s ease';
+  });
+});
+</script>
+</body>
+</html>
