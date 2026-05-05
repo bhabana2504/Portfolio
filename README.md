@@ -2,13 +2,9 @@
 
 A modern, interactive 3D portfolio showcasing my skills, projects, and experience through immersive visuals, smooth animations, and clean, high-performance design.
 
----
-
 ## Live Preview
 
 [![Live Preview](https://img.shields.io/badge/Live%20Preview-Portfolio-%23c8a96a?style=for-the-badge&logo=githubpages&logoColor=white)](https://bhabana2504.github.io/Portfolio/)
-
----
 
 ## Features
 
@@ -79,8 +75,6 @@ All personal content is in the HTML body. Key areas to update:
 }
 ```
 
----
-
 ## Browser Support
 
 Works in all modern browsers (Chrome, Firefox, Safari, Edge). Three.js requires WebGL support, which is available in all current desktop and mobile browsers.
@@ -90,9 +84,11 @@ Works in all modern browsers (Chrome, Firefox, Safari, Edge). Three.js requires 
 ## Author
 
 **Bhabana Kalita**
-- Email: bhabanakalita25@gmail.com
-- GitHub: [github.com/bhabana2504](https://github.com/bhabana2504)
-- LinkedIn: [linkedin.com/in/bhabana-kalita-338640295](https://linkedin.com/in/bhabana-kalita-338640295)
+## Contact
+
+<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg" width="16"/> Email: <a href="bhabanakalita25@gmail.com">bhabanakalita25@gmail.com</a>  
+<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" width="16"/> GitHub: <a href="https://github.com/bhabana2504">bhabana2504</a>  
+<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" width="16"/> LinkedIn: <a href="https://linkedin.com/in/bhabana-kalita-338640295">Profile</a>
 
 ---
 
