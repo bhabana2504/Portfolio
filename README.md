@@ -1,4 +1,4 @@
-# Bhabana Kalita — Personal Portfolio Website
+# Bhabana Kalita - Personal Portfolio Website
 
 A modern, interactive 3D portfolio showcasing my skills, projects, and experience through immersive visuals, smooth animations, and clean, high-performance design.
 
