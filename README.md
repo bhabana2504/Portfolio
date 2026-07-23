@@ -45,8 +45,7 @@ A modern, interactive 3D portfolio showcasing my skills, projects, and experienc
 | Fonts | Google Fonts — Bebas Neue, DM Serif Display, DM Sans |
 
 No frameworks. No build tools. No dependencies to install.
-
----
+----
 
 ## Customisation
 
